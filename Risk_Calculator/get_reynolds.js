@@ -41,15 +41,44 @@ function calculateAge(dateString) {
 
 function reynolds() {
   getPatID();
-  $.when(getObs('2085-9'), getAge(), getObs('8480-6')).done(function(hdlRaw, ageRaw, sysBPRaw) {
+  var labs = smart.patient.api.fetchAll({type: "Observation", query: {code: {$or: ['http://loinc.org|30522-7',
+           'http://loinc.org|14647-2', 'http://loinc.org|2093-3',
+           'http://loinc.org|2085-9', 'http://loinc.org|8480-6']}}});
+  $.when(getObs('2085-9'), getAge(), getObs('8480-6'), getObs('30522-7')).
+      done(function(hdlRaw, ageRaw, sysBPRaw, hsCRPRaw) {
+    var validPatient = true;
     console.log(hdlRaw);
-    var hdl = rawData.data.entry[0].resource.valueQuantity.value;
+    if(hdlRaw.data.total == 0) {
+      alert("This patient does not have any HDL measurements.");
+      validPatient = false;
+    }
+    else {
+      var hdl = hdlRaw.data.entry[0].resource.valueQuantity.value;
+    }
     console.log("HDL: " + hdl + " mg/dL");
-    console.log(ageRaw);
-    var age = calculateAge(ageRaw.data.entry[0].resource.birthDate);
+    if (ageRaw.data.total == 0) {
+      alert("This patient does not have a birth date.");
+      validPatient = false;
+    }
+    else {
+      var age = calculateAge(ageRaw.data.entry[0].resource.birthDate);
+    }
     console.log("Age: " + age + " years");
-    console.log(sysBPRaw);
-    var sysBP = rawData.data.entry[0].resource.component.valueQuantity.value
+    if (sysBPRaw.data.total == 0) {
+      alert("This patient does not have any BP measurements.");
+      validPatient = false;
+    }
+    else {
+      var sysBP = sysBPRaw.data.entry[0].resource.component.valueQuantity.value;
+    }
     console.log("SysBP: " + sysBP + " mmHg");
+    if (hsCRPRaw.data.total == 0) {
+      alert("This patient does not have any hsCRP measurements.");
+      validPatient = false;
+    }
+    else {
+      var hsCRP = hsCRPRaw.data.entry[0].resource.component.valueQuantity.value;
+    }
+    console.log("hsCRP: " + hsCRP + " mg/L");
   });
 }
