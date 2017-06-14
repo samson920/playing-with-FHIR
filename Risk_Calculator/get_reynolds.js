@@ -1,6 +1,6 @@
 var smart;
 var patientID;
-
+var score;
 function getPatID() {
   patientID = document.getElementById("patID").value;
   // var demo = {
@@ -22,8 +22,8 @@ function getObs(LOINCcode) {
 		]}});
 }
 
-function getAge() {
-  return birthdate = smart.patient.api.search({type:'Patient'});
+function getPatient() {
+  return smart.patient.api.search({type:'Patient'});
 }
 
 //calculate age from date of birthday
@@ -43,42 +43,39 @@ function reynolds() {
   getPatID();
   var labs = smart.patient.api.fetchAll({type: "Observation", query: {code: {$or: ['http://loinc.org|30522-7',
            'http://loinc.org|14647-2', 'http://loinc.org|2093-3',
-           'http://loinc.org|2085-9', 'http://loinc.org|8480-6']}}});
-  $.when(getObs('2085-9'), getAge(), getObs('8480-6'), getObs('30522-7')).
-      done(function(hdlRaw, ageRaw, sysBPRaw, hsCRPRaw) {
-    var validPatient = true;
-    console.log(hdlRaw);
-    if(hdlRaw.data.total == 0) {
-      alert("This patient does not have any HDL measurements.");
+           'http://loinc.org|2085-9', 'http://loinc.org|55284-4']}}});
+  $.when(getPatient(), labs).done(function(patRaw, labs) {
+    let validPatient = true;
+    if (patRaw.data.total == 0) {
+      alert("This patient does not exist.");
       validPatient = false;
     }
     else {
-      var hdl = hdlRaw.data.entry[0].resource.valueQuantity.value;
+      var age = calculateAge(patRaw.data.entry[0].resource.birthDate);
+      var gender = patRaw.data.entry[0].resource.gender;
     }
-    console.log("HDL: " + hdl + " mg/dL");
-    if (ageRaw.data.total == 0) {
-      alert("This patient does not have a birth date.");
+    var byCodes = smart.byCodes(labs, 'code');
+    var hscrpArr = _.sortBy(byCodes("30522-7"), 'effectiveDateTime').reverse();
+    var cholesterolArr = _.sortBy(byCodes("14647-2", "2093-3"), 'effectiveDateTime').reverse();
+    var hdlArr = _.sortBy(byCodes("2085-9"), 'effectiveDateTime').reverse();
+    var BPArr = _.sortBy(byCodes("55284-4"), 'effectiveDateTime').reverse();
+    var smoker = document.getElementById("smoker").checked;
+    var famHist = document.getElementById("famHist").checked;
+    if(hscrpArr.length == 0 || cholesterolArr.length == 0 || hdlArr .length == 0|| BPArr.length == 0) {
       validPatient = false;
     }
-    else {
-      var age = calculateAge(ageRaw.data.entry[0].resource.birthDate);
+    if (validPatient) { //for females only
+      let b = 0.0799*age+3.137*Math.log(BPArr[0].component[0].valueQuantity.value)
+      +0.180*Math.log(hscrpArr[0].valueQuantity.value)+1.382*Math.log(cholesterolArr[0].valueQuantity.value)
+      -1.172*Math.log(hdlArr[0].valueQuantity.value);
+      if (smoker) {
+        b += 0.818;
+      }
+      if (famHist) {
+        b += 0.438;
+      }
+      score = (1-Math.pow(0.98756,Math.pow(Math.E,b-22.325)));
     }
-    console.log("Age: " + age + " years");
-    if (sysBPRaw.data.total == 0) {
-      alert("This patient does not have any BP measurements.");
-      validPatient = false;
-    }
-    else {
-      var sysBP = sysBPRaw.data.entry[0].resource.component.valueQuantity.value;
-    }
-    console.log("SysBP: " + sysBP + " mmHg");
-    if (hsCRPRaw.data.total == 0) {
-      alert("This patient does not have any hsCRP measurements.");
-      validPatient = false;
-    }
-    else {
-      var hsCRP = hsCRPRaw.data.entry[0].resource.component.valueQuantity.value;
-    }
-    console.log("hsCRP: " + hsCRP + " mg/L");
+    console.log(score);
   });
 }
