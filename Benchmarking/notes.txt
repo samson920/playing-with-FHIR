@@ -1,0 +1,37 @@
+for 50 patients, get 20 observations
+for 10 patients, get the last twenty observations
+
+http://fhirtest.uhn.ca/baseDstu3/Observation?_sort=patient,code,-date&_count=50
+
+	then you can say have a counter for the number of patients
+
+	if you wanted 5 observations, you would take 5, and then have to go to the next patient and do another 5? how to do that? 
+
+		you'd have to get an increasing list of patient IDs and have that stored, and then look for them that way. what a living hell this is. 
+
+	time points for a particular code? 
+		for one patient that is easy. since we are sorting by code. 
+
+
+dan gotlieb
+
+
+for X patients, get Y observations for Z time points
+
+for all patients, get Y observations for Z time points
+for X patients, get all observations, for Z time points
+for X patients, get Y observations, for all time points
+
+caveats with the method
+------
+
+1?. we are going to only choose the first X ids (regardless of how they are ordered[the server might give it back to you in different orders])
+	a. this is to make the pulling of the patients less time consuming
+	b. should randomize IDs before pulling the patients, but makes the call harder
+
+2. the number of data points is at most the values put in the text boxes (sometimes there isn't enough data)
+	a. the data for the "amount transferred" can mediate this a little, but still not great
+
+3. 
+
+
