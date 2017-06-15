@@ -1,48 +1,17 @@
-var smart;
-var patientID;
-var score;
-function getPatID1() {
-  patientID = document.getElementById("patID2").value;
-  // var demo = {
-  //   serviceUrl: "http://fhirtest.uhn.ca/baseDstu3",
-  //   patientId: patientId
-  // }
-  smart = FHIR.client({
-      serviceUrl: 'http://fhirtest.uhn.ca/baseDstu3',
-      patientId: patientID //55439
-  });
-}
-
-function getPatient1() {
-  return smart.patient.api.search({type:'Patient'});
-}
-
-//calculate age from date of birthday
-//@param dateString: date of birth @return age
-function calculateAge1(dateString) {
-    var today = new Date();
-    var birthDate = new Date(dateString);
-    var age = today.getFullYear() - birthDate.getFullYear();
-    var m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-    }
-    return age;
-}
-
 function CKDtoKF() {
-  getPatID1();
+  var smart = getPatID("patIDKF");
+  var score;
   var labs = smart.patient.api.fetchAll({type: "Observation", query: {code: {$or: ['http://loinc.org|48643-1',
            'http://loinc.org|48642-3', 'http://loinc.org|33914-3',
            'http://loinc.org|14958-3', 'http://loinc.org|14959-1']}}});
-  $.when(getPatient1(), labs).done(function(patRaw, labs) {
+  $.when(getPatient(smart), labs).done(function(patRaw, labs) {
     let validPatient = true;
     if (patRaw.data.total == 0) {
       alert("This patient does not exist.");
       validPatient = false;
     }
     else {
-      var age = calculateAge1(patRaw.data.entry[0].resource.birthDate);
+      var age = calculateAge(patRaw.data.entry[0].resource.birthDate);
       var gender = patRaw.data.entry[0].resource.gender;
       if (gender == "male") {gender = 1;}
       else if (gender == "female") {gender = 0;}
