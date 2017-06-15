@@ -10,6 +10,7 @@
   <script data-require="jqFhir@0.0.5" data-semver="0.0.5" src="https://cdn.rawgit.com/FHIR/fhir.js/v0.0.5/dist/jqFhir.js"></script>
   <script src="underscore.js"></script>
   <script src="get_reynolds.js"></script>
+  <script src="get_KFRisk.js"></script>
   <h1 id = "page_title"> Risk Scores! <br> </h1>
   <h3 id="risk_scores"> Reynolds Risk Score </h3>
   <form>
@@ -17,8 +18,13 @@
     <input type="text" id="patID"> <br>
     <input type="checkbox" id="smoker"> I am a smoker. <br>
     <input type="checkbox" id="famHist"> I have family history of cardiovascular disease. <br>
-    <input type="button" value="Get Score" onclick="reynolds()">
+    <input type="button" value="Get Score" onclick="reynolds()"> <br> <br> <br>
   </form>
+  <h3> Progression from Chronic Kidney Disease to Kidney Failure </h3>
+  <form>
+    Patient ID: <br>
+    <input type="text" id="patID2"> <br>
+    <input type="button" value="Get Score" onclick="CKDtoKF()"><br>
   <script src="https://cdn.rawgit.com/smart-on-fhir/client-js/v0.1.8/dist/fhir-client.js"></script>
 </body>
 

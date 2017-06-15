@@ -9,17 +9,8 @@ function getPatID() {
   // }
   smart = FHIR.client({
       serviceUrl: 'http://fhirtest.uhn.ca/baseDstu3',
-      patientId: patientID //57089
+      patientId: patientID //59859
   });
-}
-//@param code: the LOINC code for the Observation
-//@return the raw data of the most recent observation
-function getObs(LOINCcode) {
-  return smart.patient.api.search({type:'Observation',
-    query: {code: LOINCcode, $sort: [
-					["date",
-					"desc"]
-		]}});
 }
 
 function getPatient() {
@@ -39,7 +30,7 @@ function calculateAge(dateString) {
     return age;
 }
 
-function reynolds() {
+function reynolds() { //need to invalidate for diabetic men & modify for diabetic women
   getPatID();
   var labs = smart.patient.api.fetchAll({type: "Observation", query: {code: {$or: ['http://loinc.org|30522-7',
            'http://loinc.org|14647-2', 'http://loinc.org|2093-3',
@@ -64,7 +55,7 @@ function reynolds() {
     if(hscrpArr.length == 0 || cholesterolArr.length == 0 || hdlArr .length == 0|| BPArr.length == 0) {
       validPatient = false;
     }
-    if (validPatient) { //for females only
+    if (validPatient && gender == "female") {
       let b = 0.0799*age+3.137*Math.log(BPArr[0].component[0].valueQuantity.value)
       +0.180*Math.log(hscrpArr[0].valueQuantity.value)+1.382*Math.log(cholesterolArr[0].valueQuantity.value)
       -1.172*Math.log(hdlArr[0].valueQuantity.value);
@@ -74,8 +65,28 @@ function reynolds() {
       if (famHist) {
         b += 0.438;
       }
-      score = (1-Math.pow(0.98756,Math.pow(Math.E,b-22.325)));
+      score = 100*(1-Math.pow(0.98756,Math.pow(Math.E,b-22.325)));
+      score = score.toFixed(2);
+      console.log(score);
+      alert("Your chance of dying from a major cardiac event in the next ten years are " + score + "%.");
     }
-    console.log(score);
+    else if(validPatient && gender == "male") {
+      let b = 4.385*Math.log(age)+2.607*Math.log(BPArr[0].component[0].valueQuantity.value)+
+      0.963*Math.log(cholesterolArr[0].valueQuantity.value)-0.772*Math.log(hdlArr[0].valueQuantity.value)+
+      0.102*Math.log(hscrpArr[0].valueQuantity.value);
+      if (smoker) {
+        b += 0.405;
+      }
+      if (famHist) {
+        b += 0.541;
+      }
+      score = 100*(1-Math.pow(0.8990, Math.pow(Math.E,b-33.097)));
+      score = score.toFixed(2);
+      console.log(score);
+      alert("Your chance of dying from a major cardiac event in the next ten years are " + score + "%.");
+    }
+    else {
+      alert("This patient is missing one of the measurements needed for the calculation.");
+    }
   });
 }
