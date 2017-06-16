@@ -26,3 +26,13 @@ function calculateAge(dateString) {
     }
     return age;
 }
+
+function pullCondition(fetchResult, condID) {
+  var resultSet = [];
+  for (var i = 0; i<fetchResult.length; i++) {
+    if (condID.includes(fetchResult[i].code.coding[0].code)) {
+      resultSet.push(fetchResult[i]);
+    }
+  }
+  return resultSet;
+}

@@ -1,4 +1,4 @@
-function CKDtoKF() {
+function CKDtoKF() { //add units check
   var smart = getPatID("patIDKF");
   var score;
   var labs = smart.patient.api.fetchAll({type: "Observation", query: {code: {$or: ['http://loinc.org|48643-1',
@@ -33,9 +33,5 @@ function CKDtoKF() {
     else {
       alert("This patient is missing measurements that are necessary to making the prediction.");
     }
-    console.log(gender);
-    console.log(age);
-    console.log(GFRArr);
-    console.log(UACArr);
   });
 }

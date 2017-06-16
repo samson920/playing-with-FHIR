@@ -12,6 +12,7 @@
   <script src="utilities.js"></script>
   <script src="get_reynolds.js"></script> <!--Sample Patient: 59859-->
   <script src="get_KFRisk.js"></script> <!--Sample Patient: 58738-->
+  <script src="CHAD.js"></script> <!--Sample Patient: 142344-->
   <h1 id = "page_title"> Risk Scores! <br> </h1>
   <h3 id="risk_scores"> Reynolds Risk Score </h3>
   <form>
@@ -25,7 +26,14 @@
   <form>
     Patient ID: <br>
     <input type="text" id="patIDKF"> <br>
-    <input type="button" value="Get Score" onclick="CKDtoKF()"><br>
+    <input type="button" value="Get Score" onclick="CKDtoKF()"><br> <br> <br>
+  </form>
+  <h3> Risk of Stroke for Patients with Atrial Fibrillation</h3>
+  <form>
+    Patient ID: <br>
+    <input type="text" id="patIDStroke"> <br>
+    <input type="button" value="Get Score" onclick="strokeRisk()"><br>
+  </form>
   <script src="https://cdn.rawgit.com/smart-on-fhir/client-js/v0.1.8/dist/fhir-client.js"></script>
 </body>
 

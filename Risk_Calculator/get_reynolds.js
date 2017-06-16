@@ -1,4 +1,4 @@
-function reynolds() { //need to invalidate for diabetic men & modify for diabetic women
+function reynolds() { //need to invalidate for diabetic men & modify for diabetic women; add units check
   var smart = getPatID("patIDReynolds");
   var labs = smart.patient.api.fetchAll({type: "Observation", query: {code: {$or: ['http://loinc.org|30522-7',
            'http://loinc.org|14647-2', 'http://loinc.org|2093-3',
