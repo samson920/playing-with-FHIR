@@ -17,10 +17,13 @@ function CKDtoKF() { //add units check
       else if (gender == "female") {gender = 0;}
       else {alert("Patient has no gender.");}
     }
+    labs = _.sortBy(labs, 'effectiveDateTime').reverse();
     var byCodes = smart.byCodes(labs, 'code');
-    var GFRArr = _.sortBy(byCodes("48643-1", "48642-3", "33914-3"), 'effectiveDateTime').reverse();
-    var UACArr = _.sortBy(byCodes("14958-3", "14959-1"), 'effectiveDateTime').reverse();
-    if (GFRArr.length == 0 || UACArr.length == 0) {
+    var GFRArr = byCodes("48643-1", "48642-3", "33914-3");
+    var UACArr = byCodes("14958-3", "14959-1");
+    var scoreSets = findPriorSets({GFRArr, UACArr}, labs);
+    console.log(scoreSets[3]);
+    if (scoreSets.length = 0) {
       validPatient = false;
     }
     if(validPatient) {

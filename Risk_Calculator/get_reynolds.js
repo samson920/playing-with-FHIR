@@ -26,16 +26,19 @@ function reynolds() { //need to invalidate for diabetic men & modify for diabeti
     var BPArr = byCodes(BP);
     var smoker = document.getElementById("smoker").checked;
     var famHist = document.getElementById("famHist").checked;
-    var scoreSets = findPriorSets({hscrpArr, cholesterolArr, hdlArr, BPArr}, labs);
+    var scoreSets = findPriorSets({hscrpArr, cholesterolArr, hdlArr, BPArr},
+      [["30522-7"], ["2093-3"], ["2085-9"], ["55284-4"]],
+      ['hsCRP', 'Cholesterol', 'HDL', 'BP'], labs);
+    console.log(scoreSets);
     if(scoreSets.length === 0) {
       validPatient = false;
     }
     if (validPatient && gender == "female") {
       for(var i = 0; i < scoreSets.length; i++) {
-        let b = 0.0799*age+3.137*Math.log(scoreSets[i][BP].component[0].valueQuantity.value)
-        +0.180*Math.log(scoreSets[i][HSCRP].valueQuantity.value)
-        +1.382*Math.log(scoreSets[i][CHOLESTEROL].valueQuantity.value)
-        -1.172*Math.log(scoreSets[i][HDL].valueQuantity.value);
+        let b = 0.0799*age+3.137*Math.log(scoreSets[i]['BP'].component[0].valueQuantity.value)
+        +0.180*Math.log(scoreSets[i]['hsCRP'].valueQuantity.value)
+        +1.382*Math.log(scoreSets[i]['Cholesterol'].valueQuantity.value)
+        -1.172*Math.log(scoreSets[i]['HDL'].valueQuantity.value);
         if (smoker) {
           b += 0.818;
         }
@@ -62,10 +65,10 @@ function reynolds() { //need to invalidate for diabetic men & modify for diabeti
     }
     else if(validPatient && gender == "male") {
       for(var i = 0; i < scoreSets.length; i++) {
-        let b = 4.385*Math.log(age)+2.607*Math.log(scoreSets[i][BP].component[0].valueQuantity.value)+
-        0.963*Math.log(scoreSets[i][CHOLESTEROL].valueQuantity.value)
-        -0.772*Math.log(scoreSets[i][HDL].valueQuantity.value)+
-        0.102*Math.log(scoreSets[i][HSCRP].valueQuantity.value);
+        let b = 4.385*Math.log(age)+2.607*Math.log(scoreSets[i]['BP'].component[0].valueQuantity.value)+
+        0.963*Math.log(scoreSets[i]['Cholesterol'].valueQuantity.value)
+        -0.772*Math.log(scoreSets[i]['HDL'].valueQuantity.value)+
+        0.102*Math.log(scoreSets[i]['hsCRP'].valueQuantity.value);
         if (smoker) {
           b += 0.405;
         }
