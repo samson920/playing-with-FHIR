@@ -1,3 +1,58 @@
+const TIME_THRESHOLD = 10000000;
+
+function findPriorSets(bundles, aggBund) {
+  var completeSets = [];
+  var sizeArr = {};
+  for (bundle in bundles){
+    sizeArr[bundle] = bundles[bundle].length;
+  }
+  var index;
+  var minVal;
+  var first = true;
+  for (item in sizeArr) {
+    if(first) {
+      minVal = sizeArr[item];
+      index = item;
+      first = false;
+    }
+    if(sizeArr[item] < minVal) {
+      minVal = sizeArr[item];
+      index = item;
+    }
+  }
+  var iteratorType = bundles[index][0].code.coding[0].code;
+  for(let i = 0; i < aggBund.length; i++) {
+    var variablesObject = {};
+    if (aggBund[i].code.coding[0].code === iteratorType) {
+      variablesObject[aggBund[i].code.coding[0].code] = aggBund[i];
+      let j = i-1;
+      while(j >= 0 && calculateTimeDiffHours(aggBund[j].effectiveDateTime, aggBund[i].effectiveDateTime) < TIME_THRESHOLD) {
+        if (!(variablesObject.hasOwnProperty(aggBund[j].code.coding[0].code))) {
+          variablesObject[aggBund[j].code.coding[0].code] = aggBund[j];
+        }
+        j--;
+      }
+      j = i+1;
+      while(j < aggBund.length && calculateTimeDiffHours(aggBund[j].effectiveDateTime, aggBund[i].effectiveDateTime) < TIME_THRESHOLD) {
+        if (!(variablesObject.hasOwnProperty(aggBund[j].code.coding[0].code))) {
+          variablesObject[aggBund[j].code.coding[0].code] = aggBund[j];
+        }
+        j++;
+      }
+    }
+    var full = true;
+    for(bundle in bundles) {
+      if(!(variablesObject.hasOwnProperty(bundles[bundle][0].code.coding[0].code))) {
+        full = false;
+      }
+    }
+    if(full) {
+      completeSets.push(jQuery.extend(true, {}, variablesObject));
+    }
+  }
+  return completeSets;
+}
+
 function getPatID(patID) {
   patientID = document.getElementById(patID).value;
   // var demo = {
@@ -25,6 +80,14 @@ function calculateAge(dateString) {
         age--;
     }
     return age;
+}
+
+function calculateTimeDiffHours(date1, date2) {
+  var today = new Date(date1);
+  var measurementDate = new Date(date2);
+  var timeDiff = Math.abs(today.getTime() - measurementDate.getTime());
+  var diffHours = Math.ceil(timeDiff / (1000 * 3600));
+  return diffHours;
 }
 
 function pullCondition(fetchResult, condID) {
