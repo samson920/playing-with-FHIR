@@ -55,7 +55,7 @@ function findPriorSets(bundles, codes, names, aggBund) {
         }
       }
       if(full) {
-        completeSets.push(jQuery.extend(true, {}, variablesObject));
+        completeSets.push(variablesObject);
       }
     }
   }

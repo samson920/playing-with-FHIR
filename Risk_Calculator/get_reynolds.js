@@ -29,7 +29,6 @@ function reynolds() { //need to invalidate for diabetic men & modify for diabeti
     var scoreSets = findPriorSets({hscrpArr, cholesterolArr, hdlArr, BPArr},
       [["30522-7"], ["2093-3"], ["2085-9"], ["55284-4"]],
       ['hsCRP', 'Cholesterol', 'HDL', 'BP'], labs);
-    console.log(scoreSets);
     if(scoreSets.length === 0) {
       validPatient = false;
     }
@@ -39,6 +38,7 @@ function reynolds() { //need to invalidate for diabetic men & modify for diabeti
         +0.180*Math.log(scoreSets[i]['hsCRP'].valueQuantity.value)
         +1.382*Math.log(scoreSets[i]['Cholesterol'].valueQuantity.value)
         -1.172*Math.log(scoreSets[i]['HDL'].valueQuantity.value);
+        console.log(b);
         if (smoker) {
           b += 0.818;
         }
@@ -83,5 +83,74 @@ function reynolds() { //need to invalidate for diabetic men & modify for diabeti
     else {
       alert("This patient is missing one of the measurements needed for the calculation.");
     }
+  });
+}
+
+function reynoldsPop() {
+  var sysBPData = {'sum': 0, 'count': 0};
+  var cholData = {'sum': 0, 'count': 0};
+  var hdlData = {'sum': 0, 'count': 0};
+  var hsCRPData = {'sum': 0, 'count': 0};
+  var smart = FHIR.client({
+      serviceUrl: 'http://fhirtest.uhn.ca/baseDstu3'
+  });
+  var observations = smart.api.fetchAll({type: 'Observation',
+  query: {code: {$or: ['http://loinc.org|30522-7',
+           'http://loinc.org|14647-2', 'http://loinc.org|2093-3',
+           'http://loinc.org|2085-9', 'http://loinc.org|55284-4']}}});
+  $.when(observations).done(function(observations) {
+    var byCodes = smart.byCodes(observations, 'code');
+    var hscrpArr = byCodes(HSCRP);
+    var cholesterolArr = byCodes(CHOLESTEROL);
+    var hdlArr = byCodes(HDL);
+    var BPArr = byCodes(BP);
+    for(var i = 0; i < BPArr.length; i++) {
+      if (BPArr[i]) {
+        if(BPArr[i].component) {
+          if(BPArr[i].component[0]) {
+            if(BPArr[i].component[0].valueQuantity) {
+              if (BPArr[i].component[0].valueQuantity.value <= 300) {
+                sysBPData['sum'] += BPArr[i].component[0].valueQuantity.value;
+                sysBPData['count'] += 1;
+              }
+            }
+          }
+        }
+      }
+    }
+    for(var i = 0; i < cholesterolArr.length; i++) {
+      if(cholesterolArr[i]) {
+        if(cholesterolArr[i].valueQuantity) {
+          if(cholesterolArr[i].valueQuantity.value <= 1000) {
+            cholData['sum'] += cholesterolArr[i].valueQuantity.value;
+            cholData['count'] += 1;
+          }
+        }
+      }
+    }
+    for(var i = 0; i < hdlArr.length; i++) {
+      if(hdlArr[i]) {
+        if(hdlArr[i].valueQuantity) {
+          if(hdlArr[i].valueQuantity.value <= 300) {
+            hdlData['sum'] += hdlArr[i].valueQuantity.value;
+            hdlData['count'] += 1;
+          }
+        }
+      }
+    }
+    for(var i = 0; i < hscrpArr.length; i++) {
+      if(hscrpArr[i]) {
+        if(hscrpArr[i].valueQuantity) {
+          if(hscrpArr[i].valueQuantity.value <= 100) {
+            hsCRPData['sum'] += hscrpArr[i].valueQuantity.value;
+            hsCRPData['count'] += 1;
+          }
+        }
+      }
+    }
+    console.log("Average BP for health system: " + sysBPData['sum']/sysBPData['count']);
+    console.log("Average cholesterol for health system: " + cholData['sum']/cholData['count']);
+    console.log("Average hsCRP for health system: " + hsCRPData['sum']/hsCRPData['count']);
+    console.log("Average HDL for health system: " + hdlData['sum']/hdlData['count']);
   });
 }
