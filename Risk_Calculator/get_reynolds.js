@@ -3,6 +3,8 @@ const HSCRP = "30522-7";
 const CHOLESTEROL = "2093-3";
 const HDL = "2085-9";
 function reynolds() { //need to invalidate for diabetic men & modify for diabetic women; add units check
+  var dateData = [];
+  var scoreData = [];
   var smart = getPatID("patIDReynolds");
   var labs = smart.patient.api.fetchAll({type: "Observation", query: {code: {$or: ['http://loinc.org|30522-7',
            'http://loinc.org|14647-2', 'http://loinc.org|2093-3',
@@ -38,7 +40,6 @@ function reynolds() { //need to invalidate for diabetic men & modify for diabeti
         +0.180*Math.log(scoreSets[i]['hsCRP'].valueQuantity.value)
         +1.382*Math.log(scoreSets[i]['Cholesterol'].valueQuantity.value)
         -1.172*Math.log(scoreSets[i]['HDL'].valueQuantity.value);
-        console.log(b);
         if (smoker) {
           b += 0.818;
         }
@@ -59,9 +60,18 @@ function reynolds() { //need to invalidate for diabetic men & modify for diabeti
           }
           counter++;
         }
-        avgDate = new Date(sum/counter)
-        alert("As of " + new Date(maxTime) + ", your chance of dying from a major cardiac event in the next ten years was " + score + "%.");
+        dateData.push(new Date(maxTime));
+        scoreData.push(score);
+        //alert("As of " + new Date(maxTime) + ", your chance of dying from a major cardiac event in the next ten years was " + score + "%.");
       }
+      var data = [
+        {
+          x: dateData,
+          y: scoreData,
+          type: 'scatter'
+        }
+      ];
+      Plotly.newPlot('reynoldsTime', data);
     }
     else if(validPatient && gender == "male") {
       for(var i = 0; i < scoreSets.length; i++) {
@@ -77,8 +87,17 @@ function reynolds() { //need to invalidate for diabetic men & modify for diabeti
         }
         score = 100*(1-Math.pow(0.8990, Math.pow(Math.E,b-33.097)));
         score = score.toFixed(2);
-        alert("Your chance of dying from a major cardiac event in the next ten years are " + score + "%.");
+        dateData.push(new Date(maxTime));
+        scoreData.push(score);
       }
+      var data = [
+        {
+          x: dateData,
+          y: scoreData,
+          type: 'scatter'
+        }
+      ];
+      Plotly.newPlot('reynoldsTime', data);
     }
     else {
       alert("This patient is missing one of the measurements needed for the calculation.");
@@ -86,20 +105,20 @@ function reynolds() { //need to invalidate for diabetic men & modify for diabeti
   });
 }
 
-function reynoldsPop() {
+function reynoldsPop() { //takes 2 mins to run on HAPI FHIR w 62.5k observations
   var sysBPData = {'sum': 0, 'count': 0};
   var cholData = {'sum': 0, 'count': 0};
   var hdlData = {'sum': 0, 'count': 0};
   var hsCRPData = {'sum': 0, 'count': 0};
   var smart = FHIR.client({
-      serviceUrl: 'http://fhirtest.uhn.ca/baseDstu3'
+      serviceUrl: 'http://fhirtest.uhn.ca/baseDstu3',
   });
-  var observations = smart.api.fetchAll({type: 'Observation',
+  var labs = smart.api.fetchAll({type: 'Observation',
   query: {code: {$or: ['http://loinc.org|30522-7',
            'http://loinc.org|14647-2', 'http://loinc.org|2093-3',
            'http://loinc.org|2085-9', 'http://loinc.org|55284-4']}}});
-  $.when(observations).done(function(observations) {
-    var byCodes = smart.byCodes(observations, 'code');
+  $.when(labs).done(function(labs) {
+    var byCodes = smart.byCodes(labs, 'code');
     var hscrpArr = byCodes(HSCRP);
     var cholesterolArr = byCodes(CHOLESTEROL);
     var hdlArr = byCodes(HDL);
@@ -148,9 +167,39 @@ function reynoldsPop() {
         }
       }
     }
-    console.log("Average BP for health system: " + sysBPData['sum']/sysBPData['count']);
-    console.log("Average cholesterol for health system: " + cholData['sum']/cholData['count']);
-    console.log("Average hsCRP for health system: " + hsCRPData['sum']/hsCRPData['count']);
-    console.log("Average HDL for health system: " + hdlData['sum']/hdlData['count']);
+
+    var smart2 = getPatID("patIDReynolds");
+    var labs2 = smart2.patient.api.fetchAll({type: "Observation", query: {code: {$or: ['http://loinc.org|30522-7',
+             'http://loinc.org|14647-2', 'http://loinc.org|2093-3',
+             'http://loinc.org|2085-9', 'http://loinc.org|55284-4']}}});
+    $.when(labs2).done(function(labs2) {
+      labs2 = _.sortBy(labs2, 'effectiveDateTime').reverse();
+      var byCodes = smart2.byCodes(labs2, 'code');
+      var hscrpArr = byCodes(HSCRP);
+      var cholesterolArr = byCodes(CHOLESTEROL);
+      var hdlArr = byCodes(HDL);
+      var BPArr = byCodes(BP);
+      var trace1 = {
+        x: ['Systolic BP', 'Cholesterol', 'HDL "Good" Cholesterol', "C Reactive Protein"],
+        y: [BPArr[0].component[0].valueQuantity.value, cholesterolArr[0].valueQuantity.value,
+          hdlArr[0].valueQuantity.value, hscrpArr[0].valueQuantity.value],
+        name: 'You',
+        type: 'bar'
+      };
+
+      var trace2 = {
+        x: ['Systolic BP', 'Cholesterol', 'HDL "Good" Cholesterol', "C Reactive Protein"],
+        y: [sysBPData['sum']/sysBPData['count'], cholData['sum']/cholData['count'],
+            hdlData['sum']/hdlData['count'], hsCRPData['sum']/hsCRPData['count']],
+        name: 'Average Patient',
+        type: 'bar'
+      };
+
+      var data = [trace1, trace2];
+
+      var layout = {barmode: 'group'};
+
+      Plotly.newPlot('reynoldsAvgs', data, layout);
+    });
   });
 }
