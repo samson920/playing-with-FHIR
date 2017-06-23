@@ -70,6 +70,10 @@ function getCondName(condCode, codes, names) {
   }
 }
 
+function getURL() {
+  return 'http://fhirtest.uhn.ca/baseDstu3';
+}
+
 function getPatID(patID) {
   patientID = document.getElementById(patID).value;
   // var demo = {
@@ -77,8 +81,14 @@ function getPatID(patID) {
   //   patientId: patientId
   // }
   return FHIR.client({
-      serviceUrl: 'http://fhirtest.uhn.ca/baseDstu3',
+      serviceUrl: getURL(),
       patientId: patientID
+  });
+}
+
+function getGeneralServer() {
+  return FHIR.client({
+    serviceUrl: getURL()
   });
 }
 

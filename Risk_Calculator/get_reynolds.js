@@ -2,6 +2,44 @@ const BP = "55284-4";
 const HSCRP = "30522-7";
 const CHOLESTEROL = "2093-3";
 const HDL = "2085-9";
+
+function calculateReynolds(age, sysBP, hsCRP, chol, hdl, smoker, famHist, gender) {
+  if (gender == "female") {
+    let b = 0.0799*age+3.137*Math.log(sysBP)+0.180*Math.log(hsCRP)
+    +1.382*Math.log(chol)-1.172*Math.log(hdl);
+    if (smoker) {
+      b += 0.818;
+    }
+    if (famHist) {
+      b += 0.438;
+    }
+    score = 100*(1-Math.pow(0.98756,Math.pow(Math.E,b-22.325)));
+    score = score.toFixed(2);
+    return score;
+  }
+  else {
+    let b = 4.385*Math.log(age)+2.607*Math.log(sysBP)+0.963*Math.log(chol)
+    -0.772*Math.log(hdl)+0.102*Math.log(hsCRP);
+    if (smoker) {
+      b += 0.405;
+    }
+    if (famHist) {
+      b += 0.541;
+    }
+    score = 100*(1-Math.pow(0.8990, Math.pow(Math.E,b-33.097)));
+    score = score.toFixed(2);
+    return score;
+  }
+}
+
+function calculateHypotheticals(age, sysBP, hsCRP, chol, hdl, smoker, famHist, gender) {
+  return [calculateReynolds(age, sysBP-10, hsCRP, chol, hdl, smoker, famHist, gender),
+  calculateReynolds(age, sysBP, hsCRP-0.2, chol, hdl, smoker, famHist, gender),
+  calculateReynolds(age, sysBP, hsCRP, chol-20, hdl, smoker, famHist, gender),
+  calculateReynolds(age, sysBP, hsCRP, chol, hdl+5, smoker, famHist, gender),
+  calculateReynolds(age, sysBP, hsCRP, chol, hdl, false, famHist, gender)]
+}
+
 function reynolds() { //need to invalidate for diabetic men & modify for diabetic women; add units check
   var dateData = [];
   var scoreData = [];
@@ -28,26 +66,23 @@ function reynolds() { //need to invalidate for diabetic men & modify for diabeti
     var BPArr = byCodes(BP);
     var smoker = document.getElementById("smoker").checked;
     var famHist = document.getElementById("famHist").checked;
+    if (hscrpArr.length == 0 || cholesterolArr.length == 0 || hdlArr.length == 0
+    || BPArr.length == 0) {
+      alert("Patient is missing measurements.");
+      return;
+    }
     var scoreSets = findPriorSets({hscrpArr, cholesterolArr, hdlArr, BPArr},
       [["30522-7"], ["2093-3"], ["2085-9"], ["55284-4"]],
       ['hsCRP', 'Cholesterol', 'HDL', 'BP'], labs);
     if(scoreSets.length === 0) {
       validPatient = false;
     }
-    if (validPatient && gender == "female") {
-      for(var i = 0; i < scoreSets.length; i++) {
-        let b = 0.0799*age+3.137*Math.log(scoreSets[i]['BP'].component[0].valueQuantity.value)
-        +0.180*Math.log(scoreSets[i]['hsCRP'].valueQuantity.value)
-        +1.382*Math.log(scoreSets[i]['Cholesterol'].valueQuantity.value)
-        -1.172*Math.log(scoreSets[i]['HDL'].valueQuantity.value);
-        if (smoker) {
-          b += 0.818;
-        }
-        if (famHist) {
-          b += 0.438;
-        }
-        score = 100*(1-Math.pow(0.98756,Math.pow(Math.E,b-22.325)));
-        score = score.toFixed(2);
+    if (validPatient) {
+      var i = 0;
+      for(i = 0; i < scoreSets.length; i++) {
+        score = calculateReynolds(age,scoreSets[i]['BP'].component[0].valueQuantity.value,
+        scoreSets[i]['hsCRP'].valueQuantity.value, scoreSets[i]['Cholesterol'].valueQuantity.value,
+        scoreSets[i]['HDL'].valueQuantity.value, smoker, famHist, gender);
         let sum = 0;
         let counter = 0;
         let tempTime;
@@ -64,32 +99,16 @@ function reynolds() { //need to invalidate for diabetic men & modify for diabeti
         scoreData.push(score);
         //alert("As of " + new Date(maxTime) + ", your chance of dying from a major cardiac event in the next ten years was " + score + "%.");
       }
-      var data = [
-        {
-          x: dateData,
-          y: scoreData,
-          type: 'scatter'
-        }
-      ];
-      Plotly.newPlot('reynoldsTime', data);
-    }
-    else if(validPatient && gender == "male") {
-      for(var i = 0; i < scoreSets.length; i++) {
-        let b = 4.385*Math.log(age)+2.607*Math.log(scoreSets[i]['BP'].component[0].valueQuantity.value)+
-        0.963*Math.log(scoreSets[i]['Cholesterol'].valueQuantity.value)
-        -0.772*Math.log(scoreSets[i]['HDL'].valueQuantity.value)+
-        0.102*Math.log(scoreSets[i]['hsCRP'].valueQuantity.value);
-        if (smoker) {
-          b += 0.405;
-        }
-        if (famHist) {
-          b += 0.541;
-        }
-        score = 100*(1-Math.pow(0.8990, Math.pow(Math.E,b-33.097)));
-        score = score.toFixed(2);
-        dateData.push(new Date(maxTime));
-        scoreData.push(score);
-      }
+      hypotheticals = calculateHypotheticals(age, scoreSets[i-1]['BP'].component[0].valueQuantity.value,
+      scoreSets[i-1]['hsCRP'].valueQuantity.value, scoreSets[i-1]['Cholesterol'].valueQuantity.value,
+      scoreSets[i-1]['HDL'].valueQuantity.value, smoker, famHist, gender);
+      document.getElementById("score").innerHTML = "Your most recent risk of a major cardiac event is " + score + "%.";
+      document.getElementById("hypothetical").innerHTML = "If your blood pressure was 10mmHg lower, your risk would only be " +
+      hypotheticals[0] + "%. If your C Reactive Protein were 0.2 mg/L lower, your risk would only be " +
+      hypotheticals[1] + "%. If your cholesterol was 20 mg/dL lower, your risk would only be " +
+      hypotheticals[2] + '%. If your hdl "good" cholesterol was 5 mg/dL higher, your risk would only be ' +
+      hypotheticals[3] + "%. If you didn't smoke, your risk would only be " +
+      hypotheticals[4] + "%.";
       var data = [
         {
           x: dateData,
@@ -100,19 +119,18 @@ function reynolds() { //need to invalidate for diabetic men & modify for diabeti
       Plotly.newPlot('reynoldsTime', data);
     }
     else {
-      alert("This patient is missing one of the measurements needed for the calculation.");
+      alert("This patient does not have enough measurements within a given time frame.");
     }
   });
 }
 
 function reynoldsPop() { //takes 2 mins to run on HAPI FHIR w 62.5k observations
+  //calculate averages based on observations -- skewed b/c sick ppl have more observations
   var sysBPData = {'sum': 0, 'count': 0};
   var cholData = {'sum': 0, 'count': 0};
   var hdlData = {'sum': 0, 'count': 0};
   var hsCRPData = {'sum': 0, 'count': 0};
-  var smart = FHIR.client({
-      serviceUrl: 'http://fhirtest.uhn.ca/baseDstu3',
-  });
+  var smart = getGeneralServer();
   var labs = smart.api.fetchAll({type: 'Observation',
   query: {code: {$or: ['http://loinc.org|30522-7',
            'http://loinc.org|14647-2', 'http://loinc.org|2093-3',
