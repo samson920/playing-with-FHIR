@@ -1,18 +1,49 @@
+var timePerRun = [];
+var spacePerRun = [];
+var number_of_pts = [];
+
 var patient_list = [];
 var pt_observation_dict = {};
+var pt_time_pts_dict = {};
 
 var patientResult;
 
 var pts;
 var obs;
 var time_pts;
+var bins;
 
+var t0;
+var t1;
 
+var pt_list;
 function getAllPatients(database){
 
 
+	// for (var i = 0;i < numPts.length; i++){
+	// 	console.log("patien number: ", numPts)
+	// 	initializeVars();
+
+	// 	(function(iter){
+	// 		initializeVars();
+
+	// 		console.log("iter: ", iter);
+	// 		if(iter === 0){
+	// 			timePerRun.push(0);
+	// 			spacePerRun.push(0);
+	// 			initializeVars();
+	// 		} else {
+	// 			initializeVars();
+	 			t0 = performance.now()
+				getAllData(database, "Patient", {_sort:[["identifier", ]], _elements: [["id"]]}, pts, savePatientList);
+			// }
+			
+		// })(numPts[i])
+
+	// }
+
 	//get just patient identifiers
-	getAllData(database, "Patient", {_elements: [["id"]]}, parseInt(pts), savePatientList)
+	
 	
 
 
@@ -54,6 +85,25 @@ function getAllPatients(database){
 
 }
 
+function initializeVars(){
+	pt_obs_temp = [];
+	observation_counter = 0;
+	timePointCounter = 0;
+	pt_time_pts_temp = [];
+	firstSet = [];
+
+	patient_list = [];
+	pt_observation_dict = {};
+	pt_time_pts_dict = {};
+
+	patientResult = [];
+
+	t0 = 0;
+	t1 = 0;
+
+	pt_list = [];
+}
+
 function savePatientList(result, smart){
 	//console.log("resultadfasdfa", result);
 	patient_list = result;
@@ -63,6 +113,7 @@ function savePatientList(result, smart){
 var pt_obs_temp;
 var observation_counter = 0;
 function getObservations(pt_list,smart){
+	observation_counter = 0;
 	// console.log("smart test", pt_list.length);
 	for (var i = 0; i < pt_list.length; i++){
 
@@ -75,8 +126,9 @@ function getObservations(pt_list,smart){
 			// }
 
 			//http://fhirtest.uhn.ca/baseDstu3/Observation?_sort=patient,code,-date&_count=50&patient=x
+			//jk on the above, it will choose three observations in date order however it does so
 			getAllData(smart.server.serviceUrl, "Observation", {
-					_sort:[["patient", "code", "date"]],
+					_sort:[["patient", "-date"]],
 					patient:parseInt(pt_list[cntr].resource.id),
 				}, parseInt(obs), function(result, smart){
 					observation_counter++;
@@ -85,8 +137,9 @@ function getObservations(pt_list,smart){
 					pt_observation_dict[pt_list[cntr].resource.id] = pt_obs_temp;
 
 					if(observation_counter == pt_list.length){
-						console.log(observation_counter);
-						getTimePoints();
+//						console.log(observation_counter);
+						observation_counter = 0;
+						getTimePoints(smart);
 					}
 
 				}, function(result, smart){
@@ -95,9 +148,9 @@ function getObservations(pt_list,smart){
 					pt_observation_dict[pt_list[cntr].resource.id] = [];					
 				
 					if(observation_counter == pt_list.length){
-						console.log(observation_counter);
-
-						getTimePoints();
+						observation_counter = 0;
+//						console.log(observation_counter);
+						getTimePoints(smart);
 					}
 				});
 
@@ -119,9 +172,104 @@ function getObservations(pt_list,smart){
 
 }
 
-function getTimePoints(){
-	console.log("tiem points", pt_observation_dict);
+var timePointCounter = 0;
+var pt_time_pts_temp;
+function getTimePoints(smart){
+//	console.log("got into time points", pt_observation_dict);
+	var key;
+	for (key in pt_observation_dict) {
+	    if (pt_observation_dict.hasOwnProperty(key)) {
+	        var i;
+	        var observations = pt_observation_dict[key];
+//			console.log("observation length: ", observations.length)
+
+	        for(i = 0; i<observations.length;i++){
+
+
+	        	(function(cntr, aKey, aObservations){
+
+	        		if ("code" in aObservations[cntr].resource && "coding" in aObservations[cntr].resource.code){
+
+	        			getAllData(smart.server.serviceUrl, "Observation", {
+							_sort:[["-date"]],
+							patient:parseInt(aKey),
+							code: aObservations[cntr].resource.code.coding[0]["code"]
+						}, parseInt(time_pts), function(result, smart){
+							timePointCounter++;
+							// console.log("sanity check", pt_list[cntr]);
+							pt_time_pts_temp = result;
+							pt_time_pts_dict[aObservations[cntr].resource.code.coding[0]["code"]] = pt_time_pts_temp;
+
+							if(timePointCounter == aObservations.length){
+//								console.log(timePointCounter);
+								timePointCounter = 0;
+
+								drawGraph();
+							}
+
+						}, function(result, smart){
+							timePointCounter++;
+							// console.log("no callback", result);
+						
+							pt_time_pts_dict[aObservations[cntr].resource.code.coding[0]["code"]] = pt_time_pts_temp;
+							if(timePointCounter == aObservations.length){
+//								console.log(timePointCounter);
+								
+								timePointCounter = 0;
+								// drawGraph();
+							}
+						});
+	        		}
+
+
+	        	})(i, key, observations);
+
+	        }
+
+	    }
+	}
 }
+
+function drawGraph(){
+
+	t1 = performance.now()
+	//console.log("performance: ", t1-t0);
+
+	if (!(sizeof(pt_observation_dict)+sizeof(pt_time_pts_dict) in spacePerRun)){
+
+	timePerRun.push((t1-t0)/1000.0);
+	spacePerRun.push(sizeof(pt_observation_dict)+sizeof(pt_time_pts_dict));
+	number_of_pts.push(pts);
+	// timePerRun = Array.from(new Set(timePerRun));
+	// spacePerRun = Array.from(new Set(spacePerRun));
+
+
+	}
+
+	console.log("final answers: ", spacePerRun);
+	console.log("final answers 2", timePerRun);
+	console.log("final answers 3", number_of_pts);
+
+	var graph1 = document.getElementById('results1');
+	Plotly.newPlot( graph1, [{
+	x: number_of_pts,
+	y: spacePerRun }], {
+//	margin: { t: 0 },
+	xaxis: {title: 'Patients'},
+  	yaxis: {title: 'Data Transferred'} } );
+
+
+
+	var graph2 = document.getElementById('results2');
+	Plotly.newPlot( graph2, [{
+	x: number_of_pts,
+	y: timePerRun }], {
+//	margin: { t: 0 },
+	xaxis: {title: 'Patients'},
+  	yaxis: {title: 'Time To Retrieve'} } );
+}
+
+
 
 // function addToPatientList(resource){
 // 	patient_list.push(resource);
@@ -141,11 +289,14 @@ function getData(){
 	// 		}
 	// 	}).then(function(results){console.log("testing the sanity; ", results)})
 	
-	pts = document.getElementById('patients').value || 0;
-	obs = document.getElementById('obs').value || 0;
-	time_pts = document.getElementById('time_pts').value || 0;
+	
+	pts = parseInt(document.getElementById('patients').value) || 0;
+	obs = parseInt(document.getElementById('obs').value) || 0;
+	time_pts = parseInt(document.getElementById('time_pts').value) || 0;
+	bins = parseInt(document.getElementById('bins').value) || 0;
 
 	var database = document.getElementById("databases").value || 0;
+	
 	if(database === 0){
 		alert("We need at least one database!");
 		return;
@@ -159,9 +310,20 @@ function getData(){
 
 	console.log(databases);
 
-	for (var i = 0; i < databases.length; i++){
+		for (var i = 0; i < databases.length; i++){
+
+		// var sections = [];
+		// if (bins !== 0){
+		// 		var section = Math.round(pts/bins);
+		// 		sections.push(0);
+		// 		var n = 0;
+		// 		for(n = section; n<pts; n +=section){
+		// 			sections.push(n);
+		// 		}
+		// 		if(n >= pts){sections.push(pts);}
+		// 	}
 		var link = databases[i];//+"/"+""
-		var pt_list = getAllPatients(link)
+		pt_list = getAllPatients(link)
 						//.then(function(pt_list){getObservations(pt_list,smart)});
 		//console.log("help", pt_list);	
 	}
@@ -200,7 +362,6 @@ smart.api.search({
 		}).then(function(results){
 */
 
-var total;
 var firstSet;
 
 function getAllData(database, type, query, stoppingPoint, yesCallback, noCallBack){
@@ -221,7 +382,7 @@ function getAllData(database, type, query, stoppingPoint, yesCallback, noCallBac
 				noCallBack(results, smart);
 				return [];
 			}
-			console.log(results);
+			// console.log(results);
 			for(var i = 0; i < results.data.entry.length; i++){
 		      	counter++;
 		      	if((counter > stoppingPoint)){
@@ -263,7 +424,7 @@ function fetchData(smart, results, counter, stoppingPoint) {
   function goFetch(users) {
 
     return smart.api.nextPage({bundle:patientResult.data}).then(function(data){
-		  console.log("this is the data: ,");
+		  // console.log("this is the data: ,");
 	      patientResult = data;
 	      for(var i = 0; i < data.data.entry.length; i++){
 	      	counter++;

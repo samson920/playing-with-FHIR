@@ -1,28 +1,32 @@
 <html>
 <head>
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 	<script src="get_data.js"></script>
 	<script src="fhir-client.js"></script>
+	<script type="text/javascript" src="sizeof.compressed.js"></script>
+
 </head>
 <body>
 	  Database Base URL List (space separated):<br>
 	  <input type="text" id="databases" value="http://fhirtest.uhn.ca/baseDstu3"><br>
 	  # of Patients:<br>
-	  <input type="text" id="patients" value="5"><br>
+	  <input type="text" id="patients" value="20"><br>
 	  # of Observations:<br>
 	  <input type="text" id="obs" value="3"><br>
 	  # of Time Points:<br>
 	  <input type="text" id="time_pts" value="2"><br>
 	  How many bins?:<br>
-	  <input type="text" id="time_pts" value="1"><br><br>
+	  <input type="text" id="bins" value="5"><br><br>
 	  
 	  Choose something to ramp up over:<br>
-	  <input type="radio" id="pt_button"> Patient<br>
+	  <input type="radio" id="pt_button" checked> Patient<br>
 	  <input type="radio" id="obs_button"> Observation<br>
 	  <input type="radio" id="time_pts_button"> Time Points<br><br>
 
 	  <button onclick="getData()">Get Data Metrics</button>
 
-	<div id="results"></div>
+	<div id="results1" style="width:600px;height:600px;"></div>
+	<div id="results2" style="width:600px;height:600px;"></div>
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </body>

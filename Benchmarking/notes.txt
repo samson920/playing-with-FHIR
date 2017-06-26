@@ -22,6 +22,7 @@ for all patients, get Y observations for Z time points
 for X patients, get all observations, for Z time points
 for X patients, get Y observations, for all time points
 
+
 caveats with the method
 ------
 
@@ -33,5 +34,11 @@ caveats with the method
 	a. the data for the "amount transferred" can mediate this a little, but still not great
 
 3. 
+
+There were two ways that we could get the time points per observation. Either we can minimize the number of GET/POST requests and sort the "Observation" query by "code". We would then iterate over all of these and find (for testing purposes) the first three distinct codes, taking as many time points as requested along the way. 
+
+Alternatively, we can minimize the iteration, and perform additional requests based on how many time points per observation we needed. 
+
+In reality, we believe that this will depend on if we have many time points or many observations. However, for the purposes of the testing, we went with the second option, under the assumption that there will be quite a few observations per patient. In production, you will also probably want specific time points, so you would look them up by code.
 
 
