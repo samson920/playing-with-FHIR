@@ -10,6 +10,7 @@
   <script data-require="jqFhir@0.0.5" data-semver="0.0.5" src="https://cdn.rawgit.com/FHIR/fhir.js/v0.0.5/dist/jqFhir.js"></script>
   <script src="underscore.js"></script>
   <script src="utilities.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <script src="get_reynolds.js"></script> <!--Sample Patient: 59859-->
   <script src="get_KFRisk.js"></script> <!--Sample Patient: 58738-->
   <script src="CHAD.js"></script> <!--Sample Patient: 142344-->
@@ -20,8 +21,13 @@
     <input type="text" id="patIDReynolds" value="59859"> <br>
     <input type="checkbox" id="smoker"> I am a smoker. <br>
     <input type="checkbox" id="famHist"> I have family history of cardiovascular disease. <br>
-    <input type="button" value="Get Score" onclick="reynolds()"> <br> <br> <br>
+    <input type="button" value="Get Score" onclick="reynolds()">
+    <input type="button" value="Population Data" onclick="reynoldsPop()"><br> <br> <br>
   </form>
+  <p id="score"> </p>
+  <p id="hypothetical"> </p>
+  <div id="reynoldsTime" style="width: 360px; height: 300px;"></div>
+  <div id="reynoldsAvgs" style="width: 720px; height: 600px;"></div>
   <h3> Progression from Chronic Kidney Disease to Kidney Failure </h3>
   <form>
     Patient ID: <br>

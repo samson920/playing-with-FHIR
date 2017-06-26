@@ -17,18 +17,39 @@ function CKDtoKF() { //add units check
       else if (gender == "female") {gender = 0;}
       else {alert("Patient has no gender.");}
     }
+    labs = _.sortBy(labs, 'effectiveDateTime').reverse();
     var byCodes = smart.byCodes(labs, 'code');
-    var GFRArr = _.sortBy(byCodes("48643-1", "48642-3", "33914-3"), 'effectiveDateTime').reverse();
-    var UACArr = _.sortBy(byCodes("14958-3", "14959-1"), 'effectiveDateTime').reverse();
-    if (GFRArr.length == 0 || UACArr.length == 0) {
+    var GFRArr = byCodes("48643-1", "48642-3", "33914-3");
+    var UACArr = byCodes("14958-3", "14959-1");
+    var scoreSets = findPriorSets({GFRArr, UACArr},
+      [["48643-1", "48642-3", "33914-3"], ["14958-3", "14959-1"]],
+      ['gfr', 'uac'], labs);
+    console.log(GFRArr);
+    console.log(UACArr);
+    if (scoreSets.length === 0) {
       validPatient = false;
     }
     if(validPatient) {
-      let a = 0.2694*gender-0.2167*age/10-0.55418*GFRArr[0].valueQuantity.value/5+
-      0.45608*Math.log(UACArr[0].valueQuantity.value);
-      score = 100*(1-Math.pow(0.924, Math.pow(Math.E, a+2.96774)));
-      score = score.toFixed(2);
-      alert("The probability your CKD will result in kidney failure in the next five years is " + score + "%.");
+      for (var i = 0; i < scoreSets.length; i++) {
+        let a = 0.2694*gender-0.2167*age/10-0.55418*scoreSets[i]['gfr'].valueQuantity.value/5+
+        0.45608*Math.log(scoreSets[i]['uac'].valueQuantity.value);
+        score = 100*(1-Math.pow(0.924, Math.pow(Math.E, a+2.96774)));
+        score = score.toFixed(2);
+        let sum = 0;
+        let counter = 0;
+        let tempTime;
+        let maxTime = 0;
+        for(variable in scoreSets[i]) {
+          tempTime = new Date(scoreSets[i][variable].effectiveDateTime);
+          sum += tempTime.getTime();
+          if (tempTime > maxTime) {
+            maxTime = tempTime;
+          }
+          counter++;
+        }
+        avgDate = new Date(sum/counter)
+        alert("As of " + new Date(maxTime) + "the probability your CKD would have resulted in kidney failure in the next five years was " + score + "%.");
+      }
     }
     else {
       alert("This patient is missing measurements that are necessary to making the prediction.");

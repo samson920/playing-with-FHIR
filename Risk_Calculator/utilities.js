@@ -1,6 +1,6 @@
 const TIME_THRESHOLD = 10000000;
 
-function findPriorSets(bundles, aggBund) {
+function findPriorSets(bundles, codes, names, aggBund) {
   var completeSets = [];
   var sizeArr = {};
   for (bundle in bundles){
@@ -21,36 +21,57 @@ function findPriorSets(bundles, aggBund) {
     }
   }
   var iteratorType = bundles[index][0].code.coding[0].code;
+  var tempPlace;
+  for (codeSet in codes) {
+    if (codes[codeSet].indexOf(iteratorType) > -1) {
+      iteratorType = names[codeSet];
+      tempPlace = codeSet;
+    }
+  }
   for(let i = 0; i < aggBund.length; i++) {
     var variablesObject = {};
-    if (aggBund[i].code.coding[0].code === iteratorType) {
-      variablesObject[aggBund[i].code.coding[0].code] = aggBund[i];
+    if (codes[tempPlace].indexOf(aggBund[i].code.coding[0].code) > -1) {
+      variablesObject[iteratorType] = aggBund[i];
       let j = i-1;
       while(j >= 0 && calculateTimeDiffHours(aggBund[j].effectiveDateTime, aggBund[i].effectiveDateTime) < TIME_THRESHOLD) {
-        if (!(variablesObject.hasOwnProperty(aggBund[j].code.coding[0].code))) {
-          variablesObject[aggBund[j].code.coding[0].code] = aggBund[j];
+        var currName = getCondName(aggBund[j].code.coding[0].code, codes, names);
+        if (!(variablesObject.hasOwnProperty(currName))) {
+          variablesObject[currName] = aggBund[j];
         }
         j--;
       }
       j = i+1;
       while(j < aggBund.length && calculateTimeDiffHours(aggBund[j].effectiveDateTime, aggBund[i].effectiveDateTime) < TIME_THRESHOLD) {
-        if (!(variablesObject.hasOwnProperty(aggBund[j].code.coding[0].code))) {
-          variablesObject[aggBund[j].code.coding[0].code] = aggBund[j];
+        var currName = getCondName(aggBund[j].code.coding[0].code, codes, names);
+        if (!(variablesObject.hasOwnProperty(currName))) {
+          variablesObject[currName] = aggBund[j];
         }
         j++;
       }
-    }
-    var full = true;
-    for(bundle in bundles) {
-      if(!(variablesObject.hasOwnProperty(bundles[bundle][0].code.coding[0].code))) {
-        full = false;
+      var full = true;
+      for(name in names) {
+        if(!(variablesObject.hasOwnProperty(names[name]))) {
+          full = false;
+        }
       }
-    }
-    if(full) {
-      completeSets.push(jQuery.extend(true, {}, variablesObject));
+      if(full) {
+        completeSets.push(variablesObject);
+      }
     }
   }
   return completeSets;
+}
+
+function getCondName(condCode, codes, names) {
+  for(codeSet in codes) {
+    if(codes[codeSet].indexOf(condCode) > -1) {
+      return names[codeSet];
+    }
+  }
+}
+
+function getURL() {
+  return 'http://fhirtest.uhn.ca/baseDstu3';
 }
 
 function getPatID(patID) {
@@ -60,8 +81,14 @@ function getPatID(patID) {
   //   patientId: patientId
   // }
   return FHIR.client({
-      serviceUrl: 'http://fhirtest.uhn.ca/baseDstu3',
+      serviceUrl: getURL(),
       patientId: patientID
+  });
+}
+
+function getGeneralServer() {
+  return FHIR.client({
+    serviceUrl: getURL()
   });
 }
 

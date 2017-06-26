@@ -16,13 +16,11 @@ function strokeRisk() { //add units check
       else if (gender == "female") {gender = 0;}
       else {alert("Patient has no gender.");}
     }
-    console.log(labs);
-    var chf = pullCondition(labs, ["42343007"]);
+    var chf = pullCondition(labs, ["42343007"]); //byCodes only works w LOINC
     var hypertension = pullCondition(labs, ["38341003"]);
     var vascDisease = pullCondition(labs, ["27550009"]);
     var diabetes = pullCondition(labs, ["73211009"]);
     var strTIAthrom = pullCondition(labs, ["230690007", "266257000", "13713005"]);
-    console.log(diabetes);
     if (age < 65) {
       age = 0;
     }
