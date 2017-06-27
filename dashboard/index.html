@@ -22,7 +22,7 @@
       <script src="js/risk_scores/CHAD.js"></script> <!--Sample Patient: 142344-->
       <script src="js/risk_scores/get_diabetes.js"></script> <!--Sample Patient: 8421-->
       <script src="js/risk_scores/getAllScores.js"></script>
-      <!-- 
+      <!--
          <div class="collapse bg-inverse" id="navbarHeader">
            <div class="container">
              <div class="row">
@@ -49,6 +49,15 @@
                </button> -->
          </div>
       </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <br><h2>Welcome Patient 0!</h2>
+          </div>
+        </div>
+      </div>
+
       <div class="container">
          <div class="row">
             <div class="col-md-6">
@@ -57,24 +66,44 @@
                      <div class="row">
                         <div class="card">
                           <div class="card-block">
-                            <img src="images/png/alcohol.png" class="img-fluid" alt="Card image cap">
-                            <p class="text-center reynolds-score" id="reynolds-score"></p>
+                            <img src="images/png/appointment-book.png" class="img-fluid" alt="Card image cap">
+                            <p class="text-center vitals">May 5th</p>
                           </div>
                         </div>
+
                         <div class="card">
-                           <img class="img-responsive" data-src="holder.js/100px280/thumb" alt="Card image cap">
+                           <div class="card-block">
+                            <img src="images/png/heart.png" class="img-fluid" alt="Card image cap">
+                            <p class="text-center vitals">84 bpm</p>
+                          </div>
                         </div>
+
                         <div class="card">
-                           <img data-src="holder.js/100px280/thumb" alt="Card image cap">
+                           <div class="card-block">
+                            <img src="images/png/sphygmomanometer.png" class="img-fluid" alt="Card image cap">
+                            <p class="text-center vitals">110/50</p>
+                          </div>
                         </div>
+
                         <div class="card">
-                           <img data-src="holder.js/100px280/thumb" alt="Card image cap">
+                           <div class="card-block">
+                            <img src="images/png/scales.png" class="img-fluid" alt="Card image cap">
+                            <p class="text-center vitals">110 lbs</p>
+                          </div>
                         </div>
+
                         <div class="card">
-                           <img data-src="holder.js/100px280/thumb" alt="Card image cap">
+                           <div class="card-block">
+                            <img src="images/png/test-tube.png" class="img-fluid" alt="Card image cap">
+                            <p class="text-center vitals">180 mg/dL</p>
+                          </div>
                         </div>
+
                         <div class="card">
-                           <img data-src="holder.js/100px280/thumb" alt="Card image cap">
+                           <div class="card-block">
+                            <img src="images/png/height.png" class="img-fluid" alt="Card image cap">
+                            <p class="text-center vitals">5 ft. 3 in.</p>
+                          </div>
                         </div>
                      </div>
                   </div>
@@ -97,11 +126,19 @@
                               <img data-src="holder.js/100px280/thumb" alt="Card image cap"> -->
                            <!--  <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p> -->
                         </div>
-                        
+
                         <div class="card">
-                           <img data-src="holder.js/100px280/thumb" alt="Card image cap">
+                          <div class="card-block">
+                            <h2 class="card-title">Kidney Failure Risk Score</h2>
+                            <div class="kidney-pic">
+                              <img src=https://d30y9cdsu7xlg0.cloudfront.net/png/17376-200.png style="width:150px;height:150px;">
+                            </div>
+                            <input type="hidden" id="patIDKF" value="58738"></input>
+                            <h5 id="kidney-score" class="kidney-score"></h5>
+                            <!--<p class="text-center reynolds-score" id="kidney-score"></p>-->
+                          </div>
                         </div>
-                        
+
                         <div class="card">
                            <div class="card-block">
                               <h3 class="card-title">Stroke Risk</h3>
@@ -117,11 +154,11 @@
                               <p class="text-center reynolds-score" id="diabetes-score"></p>
                            </div>
                         </div>
-                        
+
                         <div class="card">
                            <img data-src="holder.js/100px280/thumb" alt="Card image cap">
                         </div>
-                        
+
                         <div class="card">
                            <img data-src="holder.js/100px280/thumb" alt="Card image cap">
                         </div>
@@ -157,6 +194,6 @@
       <script src="dist/js/bootstrap.min.js"></script>
       <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
       <!--     <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
-         -->  
+         -->
    </body>
 </html>

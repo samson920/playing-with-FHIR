@@ -48,7 +48,10 @@ function CKDtoKF() { //add units check
           counter++;
         }
         avgDate = new Date(sum/counter)
-        alert("As of " + new Date(maxTime) + "the probability your CKD would have resulted in kidney failure in the next five years was " + score + "%.");
+        if(i == 0) {
+          document.getElementById("kidney-score").innerHTML = score + "%";
+        }
+        //alert("As of " + new Date(maxTime) + "the probability your CKD would have resulted in kidney failure in the next five years was " + score + "%.");
       }
     }
     else {

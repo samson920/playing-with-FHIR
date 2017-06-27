@@ -10,3 +10,20 @@
 	font-size: x-small;
 
 }
+
+.kidney-pic {
+   position: relative;
+   width: 100%; /* for IE 6 */
+}
+
+.kidney-score {
+   position: absolute;
+   top: 245px;
+   left: 62px;
+   width: 100%;
+	 color: white;
+}
+
+.vitals {
+   font-size: 32px;
+}
