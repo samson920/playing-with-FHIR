@@ -104,20 +104,20 @@ function reynolds() { //need to invalidate for diabetic men & modify for diabeti
       scoreSets[i-1]['HDL'].valueQuantity.value, smoker, famHist, gender);
       // document.getElementById("reynolds-score").innerHTML = "Your most recent risk of a major cardiac event is " + score + "%.";
       document.getElementById("reynolds-score").innerHTML = score + "%";
-      document.getElementById("hypothetical").innerHTML = "If your blood pressure was 10mmHg lower, your risk would only be " +
-      hypotheticals[0] + "%. If your C Reactive Protein were 0.2 mg/L lower, your risk would only be " +
-      hypotheticals[1] + "%. If your cholesterol was 20 mg/dL lower, your risk would only be " +
-      hypotheticals[2] + '%. If your hdl "good" cholesterol was 5 mg/dL higher, your risk would only be ' +
-      hypotheticals[3] + "%. If you didn't smoke, your risk would only be " +
-      hypotheticals[4] + "%.";
-      var data = [
-        {
-          x: dateData,
-          y: scoreData,
-          type: 'scatter'
-        }
-      ];
-      Plotly.newPlot('reynoldsTime', data);
+      // document.getElementById("hypothetical").innerHTML = "If your blood pressure was 10mmHg lower, your risk would only be " +
+      // hypotheticals[0] + "%. If your C Reactive Protein were 0.2 mg/L lower, your risk would only be " +
+      // hypotheticals[1] + "%. If your cholesterol was 20 mg/dL lower, your risk would only be " +
+      // hypotheticals[2] + '%. If your hdl "good" cholesterol was 5 mg/dL higher, your risk would only be ' +
+      // hypotheticals[3] + "%. If you didn't smoke, your risk would only be " +
+      // hypotheticals[4] + "%.";
+      // var data = [
+      //   {
+      //     x: dateData,
+      //     y: scoreData,
+      //     type: 'scatter'
+      //   }
+      // ];
+      // Plotly.newPlot('reynoldsTime', data);
     }
     else {
       alert("This patient does not have enough measurements within a given time frame.");

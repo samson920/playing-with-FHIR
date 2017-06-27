@@ -63,7 +63,9 @@ function strokeRisk() { //add units check
         break;
     }
     if(validPatient) {
-      alert("Your stroke risk is " + strkRisk + "% per year.");
+      document.getElementById("stroke-score").innerHTML = strkRisk + "%";
+
+      // alert("Your stroke risk is " + strkRisk + "% per year.");
     }
     else {
       alert("This patient is missing measurements that are necessary to making the prediction.");

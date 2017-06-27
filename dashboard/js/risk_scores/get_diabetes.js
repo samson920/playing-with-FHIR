@@ -137,7 +137,8 @@ function diabetesRisk() {
           counter++;
         }
         avgDate = new Date(sum/counter)
-        alert("As of " + new Date(maxTime) + ", your chance of getting Type 2 diabetes in the next ten years is " + score + "%.");
+        document.getElementById("diabetes-score").innerHTML = score + "%";
+        // alert("As of " + new Date(maxTime) + ", your chance of getting Type 2 diabetes in the next ten years is " + score + "%.");
       }
     }
     else {
