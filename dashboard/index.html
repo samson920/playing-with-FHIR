@@ -22,7 +22,7 @@
       <script src="js/risk_scores/CHAD.js"></script> <!--Sample Patient: 142344-->
       <script src="js/risk_scores/get_diabetes.js"></script> <!--Sample Patient: 8421-->
       <script src="js/risk_scores/getAllScores.js"></script>
-      <!-- 
+      <!--
          <div class="collapse bg-inverse" id="navbarHeader">
            <div class="container">
              <div class="row">
@@ -58,7 +58,7 @@
                         <div class="card">
                            <img data-src="holder.js/100px280/thumb" alt="Card image cap">
                            <!--                   <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                              -->                
+                              -->
                         </div>
                         <div class="card">
                            <img data-src="holder.js/100px280/thumb" alt="Card image cap">
@@ -96,11 +96,15 @@
                               <img data-src="holder.js/100px280/thumb" alt="Card image cap"> -->
                            <!--  <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p> -->
                         </div>
-                        
+
                         <div class="card">
-                           <img data-src="holder.js/100px280/thumb" alt="Card image cap">
+                          <div class="card-block">
+                            <h2 class="card-title">Kidney Failure Risk Score</h2>
+                            <input type="hidden" id="patIDKF" value="58738"></input>
+                            <p class="text-center reynolds-score" id="kidney-score"></p>
+                          </div>
                         </div>
-                        
+
                         <div class="card">
                            <div class="card-block">
                               <h3 class="card-title">Stroke Risk</h3>
@@ -116,11 +120,11 @@
                               <p class="text-center reynolds-score" id="diabetes-score"></p>
                            </div>
                         </div>
-                        
+
                         <div class="card">
                            <img data-src="holder.js/100px280/thumb" alt="Card image cap">
                         </div>
-                        
+
                         <div class="card">
                            <img data-src="holder.js/100px280/thumb" alt="Card image cap">
                         </div>
@@ -156,6 +160,6 @@
       <script src="dist/js/bootstrap.min.js"></script>
       <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
       <!--     <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
-         -->  
+         -->
    </body>
 </html>
