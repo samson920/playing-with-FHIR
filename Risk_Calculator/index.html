@@ -14,6 +14,7 @@
   <script src="get_reynolds.js"></script> <!--Sample Patient: 59859-->
   <script src="get_KFRisk.js"></script> <!--Sample Patient: 58738-->
   <script src="CHAD.js"></script> <!--Sample Patient: 142344-->
+  <script src="get_diabetes.js"></script> <!--Sample Patient: 8421-->
   <h1 id = "page_title"> Risk Scores! <br> </h1>
   <h3 id="risk_scores"> Reynolds Risk Score </h3>
   <form>
@@ -23,11 +24,11 @@
     <input type="checkbox" id="famHist"> I have family history of cardiovascular disease. <br>
     <input type="button" value="Get Score" onclick="reynolds()">
     <input type="button" value="Population Data" onclick="reynoldsPop()"><br> <br> <br>
-  </form>
+  </form><!-- 
   <p id="score"> </p>
   <p id="hypothetical"> </p>
   <div id="reynoldsTime" style="width: 360px; height: 300px;"></div>
-  <div id="reynoldsAvgs" style="width: 720px; height: 600px;"></div>
+  <div id="reynoldsAvgs" style="width: 720px; height: 600px;"></div> -->
   <h3> Progression from Chronic Kidney Disease to Kidney Failure </h3>
   <form>
     Patient ID: <br>
@@ -43,7 +44,7 @@
   <h3> Type 2 Diabetes</h3>
   <form>
       Patient ID: <br>
-      <input type="text" id="patDibRisk" value="142344"> <br>
+      <input type="text" id="patDiabRisk" value="8421"> <br>
       <input type="button" value="Get Score" onclick="diabetesRisk()"><br>
     </form>
 
