@@ -10,7 +10,7 @@ class App extends Component {
 		    baseUrl: 'http://fhirtest.uhn.ca/baseDstu3',
 		    patientId: this.props.patientID
 		});
-		console.log(fhir);
+		console.log(nativeFhir);
 		console.log(smartFHIR);
 	  	var smart = smartFHIR({
 			baseUrl: 'http://fhirtest.uhn.ca/baseDstu3',
