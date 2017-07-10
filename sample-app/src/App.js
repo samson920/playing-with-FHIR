@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import FHIR from 'fhir.js';
 import logo from './logo.svg';
 import './App.css';
 class App extends Component {
@@ -10,6 +9,7 @@ class App extends Component {
 		    baseUrl: 'http://fhirtest.uhn.ca/baseDstu3',
 		    patientId: this.props.patientID
 		});
+		//var SMARTonFHIR = require('client.js/src/adapters/jquery.js');
 		console.log(this.props.patientID);
 		this.state = {
 			patientName: "N/A",
@@ -30,7 +30,7 @@ class App extends Component {
 				patientDOB: response.data.entry[0].resource.birthDate
 			});
 	  	});
-	  	fhir.search({type: 'Encounter', count: 1, query: {_reference: patID, $sort: [["date","desc"]]}}).then(function(response){
+	  	fhir.search({type: 'Encounter', query: {_reference: patID, $sort: [["date","desc"]]}}).then(function(response){
 	  		console.log(response);
 	  	});
   	}
