@@ -5,12 +5,17 @@ class App extends Component {
 	constructor(props) {
 	 	super(props);
 	  	var nativeFhir = require('fhir.js/src/adapters/native');
+		var smartFHIR = require('client.js/src/client/client');
 	  	var fhir = nativeFhir({
 		    baseUrl: 'http://fhirtest.uhn.ca/baseDstu3',
 		    patientId: this.props.patientID
 		});
-		//var SMARTonFHIR = require('client.js/src/adapters/jquery.js');
-		console.log(this.props.patientID);
+		console.log(fhir);
+		console.log(smartFHIR);
+	  	var smart = smartFHIR({
+			baseUrl: 'http://fhirtest.uhn.ca/baseDstu3',
+		    patientId: this.props.patientID
+	  	});
 		this.state = {
 			patientName: "N/A",
 			patientGender: "N/A",
