@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "fhir.js": "0.0.20",
+    "querystring-es3": "^0.2.1",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-scripts": "1.0.10"

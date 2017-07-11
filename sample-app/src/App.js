@@ -1,28 +1,27 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+
 class App extends Component {
 	constructor(props) {
-	 	super(props);
-	  	var nativeFhir = require('fhir.js/src/adapters/native');
-		var smartFHIR = require('client.js/src/client/client');
-	  	var fhir = nativeFhir({
-		    baseUrl: 'http://fhirtest.uhn.ca/baseDstu3',
-		    patientId: this.props.patientID
-		});
+
+		//native FHIR JS client library
+		var nativeFhir = require('fhir.js/src/adapters/native');
 		console.log(nativeFhir);
-		console.log(smartFHIR);
-	  	var smart = smartFHIR({
-			baseUrl: 'http://fhirtest.uhn.ca/baseDstu3',
-		    patientId: this.props.patientID
-	  	});
-		this.state = {
-			patientName: "N/A",
-			patientGender: "N/A",
-			patientDOB: "N/A",
-			patientLastEncounter: "N/A"
-		};
-		this.getPatient(fhir);
+
+	 	super(props);
+      	var smart = FHIR.client({
+		    serviceUrl: 'http://fhirtest.uhn.ca/baseDstu3',
+		    auth: {
+		      		type: 'none'
+		    	}
+		 });
+
+		smart.api.search({type: "Observation", query: {subject: "99912345"}})
+			.then(function(r){
+				console.log("alsjdhfalsdkfjhalsdfjhasldfkjasldfajshd ",JSON.stringify(r,null,2));
+		});	    
+
 	  }
     getPatient(fhir) {
     	var app = this;
