@@ -1,9 +1,16 @@
 function getCOPD() {
 	var smart = getPatID("patCOPDRisk");
 	var score;
-	var labs = smart.patient.api.fetchAll({type: "Condition", query: {code: {$or: ['42343007','38341003',
-	'230690007', '266257000', '13713005', '27550009', '73211009']}}});
-	$.when(getPatient(smart), labs).done(function(patRaw, labs) {
+	var conditions = smart.patient.api.fetchAll({type: "Condition", query: {code: {$or: ['40917007']}}});
+	var labs = smart.patient.api.fetchAll({type: "Observation", query: {code: {$or: [
+           //BUN
+           'http://loinc.org|56115-9',
+           //BP
+           'http://loinc.org|56114-2', 
+           //Resp Rate
+           'http://loinc.org|8280-0'
+           ]}}});
+	$.when(getPatient(smart), conditions, labs).done(function(patRaw, conditions, labs) {
 	let validPatient = true;
 	if (patRaw.data.total == 0) {
 	  alert("This patient does not exist.");
