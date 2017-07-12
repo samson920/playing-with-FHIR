@@ -19,7 +19,11 @@ function findPriorSets(bundles, codes, names, aggBund) {
       minVal = sizeArr[item];
       index = item;
     }
+    if(sizeArr[item] == 0) {
+      return;
+    }
   }
+  console.log(bundles);
   var iteratorType = bundles[index][0].code.coding[0].code;
   var tempPlace;
   for (codeSet in codes) {
